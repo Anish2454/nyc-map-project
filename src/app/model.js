@@ -591,15 +591,6 @@ var toilets = [
       "place_id": "ChIJE92ULl9cwokR7fXB3KDZ_Ko"
    },
    {
-      "location": "Flushing Avenue, Bushwick Avenue & Humboldt Street",
-      "name": "Bushwick Playground & Pool",
-      "borough": "Brooklyn",
-      "open_year_round": "No",
-      "lat": 40.70181,
-      "lng": -73.939476,
-      "place_id": "ChIJ-3QCqflbwokRRB2-39l2v_c"
-   },
-   {
       "location": "Flushing & Bushwick Avenue between Garden & Beaver",
       "name": "Bushwick Playground & Pool",
       "borough": "Brooklyn",
@@ -1020,57 +1011,10 @@ var toilets = [
    },
    {
       "handicap_accessible": "Yes",
-      "location": "W 27 ST.",
-      "name": "Coney Island",
-      "borough": "Brooklyn",
-      "lat": 40.574924,
-      "lng": -73.98594,
-      "place_id": "ChIJxYx4g8pFwokRxOWbtEQbr3o"
-   },
-   {
-      "handicap_accessible": "Yes",
-      "location": "W 33 St.",
-      "name": "Coney Island",
-      "borough": "Brooklyn",
-      "lat": 40.574924,
-      "lng": -73.98594,
-      "place_id": "ChIJxYx4g8pFwokRxOWbtEQbr3o"
-   },
-   {
-      "location": "Corbin Place to Coney Island Avenue",
-      "name": "Coney Island Beach",
-      "borough": "Brooklyn",
-      "open_year_round": "Yes",
-      "lat": 40.57213,
-      "lng": -73.97933,
-      "place_id": "ChIJRWwYoTREwokRtbWBEodfuS0"
-   },
-   {
-      "handicap_accessible": "Yes",
       "location": "Stillwell Avenue",
       "name": "Coney Island Beach",
       "borough": "Brooklyn",
       "open_year_round": "Yes",
-      "lat": 40.57213,
-      "lng": -73.97933,
-      "place_id": "ChIJRWwYoTREwokRtbWBEodfuS0"
-   },
-   {
-      "handicap_accessible": "Yes",
-      "location": "West 16th Street",
-      "name": "Coney Island Beach",
-      "borough": "Brooklyn",
-      "open_year_round": "No",
-      "lat": 40.57213,
-      "lng": -73.97933,
-      "place_id": "ChIJRWwYoTREwokRtbWBEodfuS0"
-   },
-   {
-      "handicap_accessible": "Yes",
-      "location": "W 22 ST.",
-      "name": "Coney Island Beach",
-      "borough": "Brooklyn",
-      "open_year_round": "No",
       "lat": 40.57213,
       "lng": -73.97933,
       "place_id": "ChIJRWwYoTREwokRtbWBEodfuS0"
@@ -3004,6 +2948,7 @@ var toilets = [
       "location": "Quintard St Bet. Quincy Ave & Father Capodanno Blvd",
       "name": "South Beach Wetlands",
       "borough": "Staten Island",
+		"open_year_round": "Yes",
       "lat": 40.58692,
       "lng": -74.072975,
       "place_id": "ChIJDS-XCSFPwokRSWNMtP98rMo"

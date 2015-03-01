@@ -10,26 +10,37 @@
 
     <!-- Styles -->
     <!-- build:css -->
-        <link rel="stylesheet" href="bower_modules/components-bootstrap/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="bower_modules/components-bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
     <!-- endbuild -->
 
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoEAoTkZOsxERAEtnG7fkut8cmzLIRLcs">
-    </script>
-    
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoEAoTkZOsxERAEtnG7fkut8cmzLIRLcs&libraries=places"></script>
+
 </head>
 
 <body>
     <div class='navbar navbar-default navbar-static-top'>
         <div class='container-fluid'>
             <div class="navbar-header">
-                <a class='navbar-brand' href='index.html'>Public Restrooms in NYC Parks - Filter or search for a restroom</a>
+                <a class='navbar-brand' href='index.html'>Public Restrooms in NYC Parks</a>
             </div>
         </div>
     </div>
+
     <div class='container-fluid'>
         <div class='row'>
             <div class='col-md-3'>
+                <div class="media" style="font-size: 14px;" data-bind="foreach: legendIconList">
+                    <div class="media-left media-middle no-padding">
+                            <img class="media-object" src="" data-bind="attr: {src: img}">
+                    </div>
+                    <div class="media-body media-middle">
+                       <p class="no-margin">
+                            <!--ko text: name-->
+                            <!--/ko-->
+                        </p>
+                    </div>
+                </div>
                 <div class='well'>
                     <div class="btn-group-sm" role="group" aria-label="first-buttons" data-bind="foreach: filterList">
                         <button type="button" class="btn btn-default" data-bind="text: name, click: $parent.changeFilter"></button>
@@ -62,7 +73,7 @@
     <script type="text/javascript" src="bower_modules/components-bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_modules/knockout/dist/knockout.js"></script>
     <script type="text/javascript" src="app/knockout.mapping.js"></script>
-    <script type="text/javascript" src="app/model.js"></script>    
+    <script type="text/javascript" src="app/model.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <!-- endbuild -->
 

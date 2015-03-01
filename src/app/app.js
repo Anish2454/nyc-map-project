@@ -10,7 +10,6 @@ var Location = function(data) {
     this.lat = ko.observable(data.lat);
     this.lng = ko.observable(data.lng);
     this.place_id = ko.observable(data.place_id);
-    this.visible = ko.observable(true);
 }
 
 var Filter = function(data) {
@@ -28,10 +27,15 @@ var ViewModel = function() {
     this.locationList = ko.observableArray([]);
     this.filterList = ko.observableArray([]);
     this.markerList = ko.observableArray([]);
+
+    this.legendIconList = ko.observableArray([]) ;
+    this.currentMarker = ko.observable();
+    this.userSearch = ko.observable();
     this.currentFilter;
     this.infoWindow;
-    this.userSearch = ko.observable() ;
-    this.loc ;
+    this.loc;
+
+    /* == ViewModel: setup == */
 
     this.initializeMap = function() {
         var mapOptions = {
@@ -39,11 +43,12 @@ var ViewModel = function() {
                 lat: toilets[0].lat,
                 lng: toilets[0].lng
             },
-            zoom: 9
+            zoom: 10
         };
         self.map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         self.initializeLocations();
         self.initializeFilters();
+        self.initializeLegend() ;
         self.initializeMarkers();
     };
 
@@ -51,8 +56,6 @@ var ViewModel = function() {
         toilets.forEach(function(toilet) {
             self.locationList.push(new Location(toilet));
         });
-
-        console.log(self.locationList()[0].name());
     };
 
     this.initializeFilters = function() {
@@ -60,18 +63,23 @@ var ViewModel = function() {
             self.filterList.push(new Filter(filter));
         });
 
-        console.log(self.filterList()[0].name());
-
         self.currentFilter = ko.observable(self.filterList()[0]);
+    };
+
+    this.initializeLegend = function() {
+    	self.legendIconList.push({name: "Park", img: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'}) ;
+    	self.legendIconList.push({name: "Playground", img: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'}) ;
+    	self.legendIconList.push({name: "Other", img: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'}) ;
+    	
     };
 
     this.initializeMarkers = function() {
 
         //Adding one info window for the map. It will be reassigned to different markers upon map events
         self.infoWindow = new google.maps.InfoWindow({
-            //content: item.name() 
             content: ""
         });
+
 
         //Markers
         ko.utils.arrayForEach(self.locationList(), function(item) {
@@ -80,19 +88,33 @@ var ViewModel = function() {
             var tmpMarker = new google.maps.Marker({
                 position: new google.maps.LatLng(item.lat(), item.lng()),
                 title: item.name(),
-                borough: item.borough()
+                borough: item.borough(),
+                id: item.place_id(),
+                openYear: item.open_year_round(),
+                icon: function () {
+                	if (item.name().toLowerCase().indexOf("park") >= 0) {
+                		return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' ;
+                	}
+                	else if (item.name().toLowerCase().indexOf("playground") >= 0) {
+                		return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png' ;
+                	}
+                	else {
+                		return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' ;
+                	}
+
+                } () 
             });
 
-            //self.markerList.push( tmpMarker ) ;
             self.markerList.push({
                 marker: tmpMarker,
                 visible: ko.observable(true)
             });
 
             google.maps.event.addListener(tmpMarker, 'click', function() {
-                self.findLocationData() ;
+                self.currentMarker(tmpMarker);
+                self.findLocationData();
                 //self.infoWindow.setContent(tmpMarker.title);
-                self.infoWindow.open(self.map, tmpMarker);
+                //self.infoWindow.open(self.map, tmpMarker);
             });
 
         });
@@ -100,9 +122,9 @@ var ViewModel = function() {
         self.showMarkers();
     };
 
+    /* == ViewModel: basic functionality == */
+
     this.showMarkers = function() {
-        //console.log(self.currentFilter().name()) ;
-        //console.log(self.markerList()) ;
         ko.utils.arrayForEach(self.markerList(), function(item) {
             if (self.currentFilter().name() == "All" || self.currentFilter().name() == item.marker.borough) {
                 item.visible(true);
@@ -116,7 +138,6 @@ var ViewModel = function() {
 
     this.clearMarkers = function() {
         ko.utils.arrayForEach(self.markerList(), function(item) {
-            //console.log(item.borough) ;
             item.marker.setMap(null);
         });
     };
@@ -137,40 +158,61 @@ var ViewModel = function() {
     };
 
     this.searchLocation = function() {
-        //console.log(self.userSearch().toLowerCase()) ;
-        //console.log(e.keyCode) ;
-        //if (e.keyCode === 13) {
-            ko.utils.arrayForEach(self.markerList(), function(item) {
-            if(item.visible() == true) {
-              if (item.marker.title.toLowerCase().indexOf(self.userSearch().toLowerCase()) >= 0) {
-                  item.visible(true);
-                  //item.marker.setMap(self.map);
-              } else {
-                  item.visible(false);
-              }
+        ko.utils.arrayForEach(self.markerList(), function(item) {
+            if (item.visible() == true) {
+                if (item.marker.title.toLowerCase().indexOf(self.userSearch().toLowerCase()) >= 0) {
+                    item.visible(true);
+                } else {
+                    item.visible(false);
+                }
             }
-            });
-        //}
-        //beers[x].name.toLowerCase().indexOf(value.toLowerCase()) >= 0
-    } ;
+        });
+    };
 
     this.searchAuto = function() {
         ko.utils.arrayForEach(self.markerList(), function(item) {
-              if ((item.marker.title.toLowerCase().indexOf(self.userSearch().toLowerCase()) >= 0) &&
-                        (self.currentFilter().name() == "All" || self.currentFilter().name() == item.marker.borough)) {
-                  item.visible(true);
-              } else {
-                  item.visible(false);
-              }
-            });
-    } ;
+            if ((item.marker.title.toLowerCase().indexOf(self.userSearch().toLowerCase()) >= 0) &&
+                (self.currentFilter().name() == "All" || self.currentFilter().name() == item.marker.borough)) {
+                item.visible(true);
+            } else {
+                item.visible(false);
+            }
+        });
+    };
+
+    /* == ViewModel: AJAX requests to fetch infoWindow data == */
+
+    var googleKey = 'AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc';
 
     this.findLocationData = function() {
-        //var place;
+       
+    	// GOOGLE REQUEST
+        var service = new google.maps.places.PlacesService(self.map);
+
+        var request = {
+            placeId: self.currentMarker().id
+        };
+
+        service.getDetails(request, callback);
+
+        function callback(place, status) {
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                self.showInfoWindow(place);
+            }
+        }
+
+
+        // FOURSQUARE REQUEST
+        var clientID = 'HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N' ;
+        var secret = 'G4M441LF3KLNRI0EXV5K42IC3I0NAH0VOJEBVN0BJNE0GXG5' ;
+        var date = '20150226' ;
+        var lat = self.currentMarker().position.k ;
+        var lng = self.currentMarker().position.D ;
+        
         $.ajax({
-            url: 'https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc',
+            url: 'https://api.foursquare.com/v2/venues/explore?client_id='+clientID+'&client_secret='+secret+'&ll='+lat+','+lng+'&limit=5&section="food,drinks,coffee,shops"&v='+date,
             type: 'GET',
-            dataType: 'JSON',
+            dataType: "json",
             success: function (data) {
                  //data = JSON.parse(result);
                 //place = new PlaceViewModel(result);
@@ -184,31 +226,66 @@ var ViewModel = function() {
 
                 //self.loc = ko.mapping.fromJS(self.tmp());
 
+                console.log(data.response.groups[0].items) ;
 
                 //self.loc = ko.mapping.fromJS(result, {}, self);
 
                 //console.log(self.loc) ;
                 //console.log(self.loc.results()) ;
-                self.showInfoWindow(data) ;
+                //self.showInfoWindow(marker, data) ;
                 //return self.loc.results() ;
             },
             error: function (data) {
                 //left for brevity
             }
         });
-
-        
     };
 
     this.showInfoWindow = function(data) {
-        self.loc = ko.mapping.fromJS(data);
-        console.log(self.loc.results()) ;
-        console.log(self.loc.results()[0].formatted_address()) ;
+        //console.log(data) ;
+        //self.loc = ko.mapping.fromJS(data);
+        //console.log(self.loc.results());
+        //console.log(marker.title);
+        //console.log(self.loc.results()[0].formatted_address()) ;
         //console.log(JSON.stringify(data.results)) ;
-        self.infoWindow.setContent(self.loc.results()[0].formatted_address());
+
+        var title = self.currentMarker().title;
+        var openYear = self.currentMarker().openYear;
+        var address = data.formatted_address;
+        var photos = data.photos;
+
+
+        var contentString = '<div id="content">' +
+            '</div>' +
+            '<h3 class="firstHeading">' + title + ' Restroom</h3>' +
+            '<div id="bodyContent">' +
+            '<p><b>' + address + '</b></p>' +
+            '<p>Open year round: ' + openYear + '</p>' +
+            '</div>' +
+            '</div>';
+
+
+        if (typeof photos !== 'undefined') {
+            //console.log(photos);
+            //console.log(photos.length);
+
+            var imageString = '<div>';
+
+            for (var photo in photos) {
+                imageString += '<img src=' + photos[photo].getUrl({
+                    'maxWidth': 300,
+                    'maxHeight': 300
+                }) + ' width="300"/><br><br><br>'
+            }
+
+            imageString += '</div>';
+
+            contentString += imageString;
+        }
+
+        self.infoWindow.setContent(contentString);
+        self.infoWindow.open(self.map, self.currentMarker());
     };
-
-
 
     this.userSearch.subscribe(this.searchAuto);
 
@@ -218,25 +295,20 @@ var ViewModel = function() {
 
 $(window).resize(function() {
     var h = $(window).height(),
-        MapOffsetTop = 105; // Calculate the top offset
-        ScrollOffsetTop = 315 ; //scrolling bar offset
+        MapOffsetTop = 96; // Calculate the top offset
+    ScrollOffsetTop = 335; //scrolling bar offset
 
     $('#map-canvas').css('height', (h - MapOffsetTop));
-    $('.scrolling').css('height', (h-ScrollOffsetTop)) ;
+    $('.scrolling').css('height', (h - ScrollOffsetTop));
 }).resize();
 
 ko.applyBindings(new ViewModel());
 
-//var height = $('#map-canvas').parent().height() ;
-//$('#map-canvas').height(height) ;
 
+//foursquare client ID: HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N
 
-//console.log(height) ;
+//foursquare client secret: 
 
-//var parentHeight = $(this).parent().height();
-//      $(this).height(parentHeight);    
-
-//$('#map-canvas').css('height', ($(window).height()));
 
 //Google geocode API: AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc
 
