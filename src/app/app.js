@@ -10,6 +10,7 @@ var Location = function(data) {
     this.lat = ko.observable(data.lat);
     this.lng = ko.observable(data.lng);
     this.place_id = ko.observable(data.place_id);
+    this.handicap = ko.observable(data.handicap_accessible);
 }
 
 var Filter = function(data) {
@@ -28,33 +29,32 @@ var ViewModel = function() {
     this.filterList = ko.observableArray([]);
     this.markerList = ko.observableArray([]);
 
-    this.legendIconList = ko.observableArray([]) ;
+    this.legendIconList = ko.observableArray([]);
     this.currentMarker = ko.observable();
     this.userSearch = ko.observable();
     this.currentFilter;
     this.infoWindow;
-    this.loc;
 
     /* == ViewModel: setup == */
 
     this.initializeMap = function() {
         var mapOptions = {
             center: {
-                lat: toilets[0].lat,
-                lng: toilets[0].lng
+                lat: restrooms[0].lat,
+                lng: restrooms[0].lng
             },
             zoom: 10
         };
         self.map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         self.initializeLocations();
         self.initializeFilters();
-        self.initializeLegend() ;
+        self.initializeLegend();
         self.initializeMarkers();
     };
 
     this.initializeLocations = function() {
-        toilets.forEach(function(toilet) {
-            self.locationList.push(new Location(toilet));
+        restrooms.forEach(function(restroom) {
+            self.locationList.push(new Location(restroom));
         });
     };
 
@@ -67,10 +67,19 @@ var ViewModel = function() {
     };
 
     this.initializeLegend = function() {
-    	self.legendIconList.push({name: "Park", img: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'}) ;
-    	self.legendIconList.push({name: "Playground", img: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'}) ;
-    	self.legendIconList.push({name: "Other", img: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'}) ;
-    	
+        self.legendIconList.push({
+            name: "Park",
+            img: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+        });
+        self.legendIconList.push({
+            name: "Playground",
+            img: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
+        });
+        self.legendIconList.push({
+            name: "Other",
+            img: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+        });
+
     };
 
     this.initializeMarkers = function() {
@@ -83,7 +92,6 @@ var ViewModel = function() {
 
         //Markers
         ko.utils.arrayForEach(self.locationList(), function(item) {
-
             //Adding markers
             var tmpMarker = new google.maps.Marker({
                 position: new google.maps.LatLng(item.lat(), item.lng()),
@@ -91,18 +99,17 @@ var ViewModel = function() {
                 borough: item.borough(),
                 id: item.place_id(),
                 openYear: item.open_year_round(),
-                icon: function () {
-                	if (item.name().toLowerCase().indexOf("park") >= 0) {
-                		return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' ;
-                	}
-                	else if (item.name().toLowerCase().indexOf("playground") >= 0) {
-                		return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png' ;
-                	}
-                	else {
-                		return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' ;
-                	}
+                handicap: item.handicap(),
+                icon: function() {
+                    if (item.name().toLowerCase().indexOf("park") >= 0) {
+                        return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                    } else if (item.name().toLowerCase().indexOf("playground") >= 0) {
+                        return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png';
+                    } else {
+                        return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                    }
 
-                } () 
+                }()
             });
 
             self.markerList.push({
@@ -112,9 +119,7 @@ var ViewModel = function() {
 
             google.maps.event.addListener(tmpMarker, 'click', function() {
                 self.currentMarker(tmpMarker);
-                self.findLocationData();
-                //self.infoWindow.setContent(tmpMarker.title);
-                //self.infoWindow.open(self.map, tmpMarker);
+                self.findGoogleData();
             });
 
         });
@@ -182,11 +187,12 @@ var ViewModel = function() {
 
     /* == ViewModel: AJAX requests to fetch infoWindow data == */
 
-    var googleKey = 'AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc';
+    var contentGoogle;
+    var contentFoursquare;
 
-    this.findLocationData = function() {
-       
-    	// GOOGLE REQUEST
+    this.findGoogleData = function() {
+
+        // GOOGLE REQUEST
         var service = new google.maps.places.PlacesService(self.map);
 
         var request = {
@@ -197,87 +203,85 @@ var ViewModel = function() {
 
         function callback(place, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
-                self.showInfoWindow(place);
+                contentGoogle = place;
+                self.findFoursquareData();
             }
         }
-
-
-        // FOURSQUARE REQUEST
-        var clientID = 'HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N' ;
-        var secret = 'G4M441LF3KLNRI0EXV5K42IC3I0NAH0VOJEBVN0BJNE0GXG5' ;
-        var date = '20150226' ;
-        var lat = self.currentMarker().position.k ;
-        var lng = self.currentMarker().position.D ;
-        
-        $.ajax({
-            url: 'https://api.foursquare.com/v2/venues/explore?client_id='+clientID+'&client_secret='+secret+'&ll='+lat+','+lng+'&limit=5&section="food,drinks,coffee,shops"&v='+date,
-            type: 'GET',
-            dataType: "json",
-            success: function (data) {
-                 //data = JSON.parse(result);
-                //place = new PlaceViewModel(result);
-                //ko.applyBindings(place);
-                //self.tmp(result) ;
-                //console.log(self.tmp()) ;
-                //ko.mapping.fromJS(result, {}, self);
-                //self.loc.push(result) ;
-                //self.loc.push(result) ;
-                //console.log(result) ;
-
-                //self.loc = ko.mapping.fromJS(self.tmp());
-
-                console.log(data.response.groups[0].items) ;
-
-                //self.loc = ko.mapping.fromJS(result, {}, self);
-
-                //console.log(self.loc) ;
-                //console.log(self.loc.results()) ;
-                //self.showInfoWindow(marker, data) ;
-                //return self.loc.results() ;
-            },
-            error: function (data) {
-                //left for brevity
-            }
-        });
     };
 
-    this.showInfoWindow = function(data) {
-        //console.log(data) ;
-        //self.loc = ko.mapping.fromJS(data);
-        //console.log(self.loc.results());
-        //console.log(marker.title);
-        //console.log(self.loc.results()[0].formatted_address()) ;
-        //console.log(JSON.stringify(data.results)) ;
+    this.findFoursquareData = function() {
+        // FOURSQUARE REQUEST
+        var clientID = 'HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N';
+        var secret = 'G4M441LF3KLNRI0EXV5K42IC3I0NAH0VOJEBVN0BJNE0GXG5';
+        var date = '20150226';
+        var lat = self.currentMarker().position.k;
+        var lng = self.currentMarker().position.D;
 
+        $.ajax({
+                url: 'https://api.foursquare.com/v2/venues/explore?client_id=' + clientID + '&client_secret=' + secret + '&ll=' + lat + ',' + lng + '&limit=5&section="food,drinks,coffee,shops"&v=' + date,
+                type: 'GET',
+                dataType: "json"
+            }).done(function(data) {
+                contentFoursquare = data.response.groups[0].items;
+                self.showInfoWindow();
+            })
+            .fail(function(reason) {
+                console.debug(reason);
+            });
+    };
+
+    this.showInfoWindow = function() {
         var title = self.currentMarker().title;
         var openYear = self.currentMarker().openYear;
-        var address = data.formatted_address;
-        var photos = data.photos;
+        var handicap = self.currentMarker().handicap;
+        var address = contentGoogle.formatted_address;
+        var photos = contentGoogle.photos;
+        var localVenues = [];
 
-
-        var contentString = '<div id="content">' +
-            '</div>' +
-            '<h3 class="firstHeading">' + title + ' Restroom</h3>' +
+        //Title and basic restroom information
+        var contentString = '<div id="content"></div>' +
+            '<h3 >' + title + ' Restroom</h3>' +
             '<div id="bodyContent">' +
-            '<p><b>' + address + '</b></p>' +
-            '<p>Open year round: ' + openYear + '</p>' +
-            '</div>' +
-            '</div>';
+            '<p>' + address + '</p>' +
+            '<p>Bathroom open year round: ' + openYear + '</p>';
 
+        if (typeof handicap !== 'undefined') {
+            contentString += '<p>Handicap accessible</p>';
+        }
 
+        contentString += '</div></div>';
+
+        //Nearby businesses
+        var localVenuesString = '<br><h5>Nearby businesses: </h5>';
+
+        for (venue in contentFoursquare) {
+            var tmp = contentFoursquare[venue].venue;
+            console.log(tmp);
+            localVenuesString += '<div><strong>' + tmp.name + '</strong> - ' + tmp.categories[0].name + '<br>' +
+                tmp.location.formattedAddress[0] + ' ' + tmp.location.formattedAddress[1] + '<br>';
+
+            if (typeof tmp.contact.formattedPhone !== 'undefined') {
+                localVenuesString += tmp.contact.formattedPhone + '<br>';
+            }
+            if (typeof tmp.url !== 'undefined') {
+                localVenuesString += '<a href=' + tmp.url + '>' + tmp.url + '</a>';
+            }
+
+            localVenuesString += '</div><br>';
+        }
+
+        contentString += localVenuesString;
+
+        //Nearby photos
         if (typeof photos !== 'undefined') {
-            //console.log(photos);
-            //console.log(photos.length);
-
-            var imageString = '<div>';
-
+            contentString += '<h5>Nearby photos: </h5>';
+            var imageString = '<div class="row text-center">';
             for (var photo in photos) {
                 imageString += '<img src=' + photos[photo].getUrl({
                     'maxWidth': 300,
                     'maxHeight': 300
                 }) + ' width="300"/><br><br><br>'
             }
-
             imageString += '</div>';
 
             contentString += imageString;
@@ -303,15 +307,3 @@ $(window).resize(function() {
 }).resize();
 
 ko.applyBindings(new ViewModel());
-
-
-//foursquare client ID: HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N
-
-//foursquare client secret: 
-
-
-//Google geocode API: AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc
-
-//App token for public data: hpyz6OCeHJNRoyNO2KFT3iQKE
-
-//Places API search: https://maps.googleapis.com/maps/api/place/details/json?placeid=EisxODEgQ3JvdG9uYSBBdmVudWUsIEhhcnJpc29uLCBOWSAxMDUyOCwgVVNB&key=AIzaSyCdavfGaOd8gw-q3U9RF5PLKtJxyl7sxZc

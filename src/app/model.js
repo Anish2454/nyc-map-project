@@ -1,7 +1,6 @@
 var filters = [ "All", "Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"] ;
 
-
-var toilets = [
+var restrooms = [
    {
       "location": "Glenwood Road, East 100 & East 101 streets",
       "name": "100% Playground",
@@ -733,6 +732,7 @@ var toilets = [
       "location": "85 ST & 5TH AVE",
       "name": "Central Park (Ancient Playground)",
       "borough": "Manhattan",
+		"open_year_round": "Yes",
       "lat": 40.78087,
       "lng": -73.96119,
       "place_id": "ChIJa3Sxk5dYwokR-r1HwXcGrH8"
@@ -776,6 +776,7 @@ var toilets = [
       "location": "62 ST, BET WEST & CENTER DRS",
       "name": "Central Park (Heckscher Playground)",
       "borough": "Manhattan",
+	  "open_year_round": "Yes",
       "lat": 40.768486,
       "lng": -73.9772,
       "place_id": "ChIJyVaLsvZYwokRIDVJ-GYzaCg"
