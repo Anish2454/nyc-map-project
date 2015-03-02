@@ -4,12 +4,12 @@ This single-page application shows a list of all the public restrooms in NYC par
 
 ####Part 1: Finding location data for public restrooms in New York (Not included in this repo)
 
-First, linked information about public restrooms in NYC parks to latitude and longitude coordinates.
+First, I found the relevant data on NYC parks and restrooms online and linked restroom locations to latitude and longitude coordinates.
 
 1) I found a json of all the public restrooms in the city by making an API request here: 
 https://data.cityofnewyork.us/Recreation/Directory-Of-Toilets-In-Public-Parks/hjae-yuav
 
-2) Using the Google Geocoding API I matched the restroom location and borough to latitude and longitude coordinates, as well as place_id. In included this data in model.js.
+2) Using the Google Geocoding API I matched each restroom location and borough to latitude and longitude coordinates, as well as a unique Google place_id. I included this data in model.js.
 
 ####Part 2: Building a map based on the data
 
@@ -18,10 +18,9 @@ npm
 Bower
 Gulp
 
+######To create the development version, from the root folder:
 
-######To create the development version:
-
-1) Install the dependencies in the local node_modules folder, based on the package.json file
+1) Install the dependencies into the local node_modules folder, based on the package.json file
 
 `npm install`
 
