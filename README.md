@@ -15,7 +15,9 @@ https://data.cityofnewyork.us/Recreation/Directory-Of-Toilets-In-Public-Parks/hj
 
 ######What you need:
 npm
+
 Bower
+
 Gulp
 
 ######To create the development version, from the root folder:
@@ -37,7 +39,11 @@ Gulp
 ####References used
 
 Udacity website
+
 KnockoutJS documentation
+
 Foursquare API documentation
+
 Google Maps APi documentation
+
 Yeoman generator for KnockoutJS
