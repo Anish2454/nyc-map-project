@@ -37,6 +37,10 @@ var ViewModel = function() {
 
     /* == ViewModel: setup == */
 
+    this.mapTimeout = setTimeout(function() {
+        $('#map-canvas').html('Problem loading Google Maps. Please refresh your browser and try again.');
+    }, 6000);
+
     this.initializeMap = function() {
         var mapOptions = {
             center: {
@@ -46,6 +50,7 @@ var ViewModel = function() {
             zoom: 10
         };
         self.map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        clearTimeout(self.mapTimeout);
         self.initializeLocations();
         self.initializeFilters();
         self.initializeLegend();
@@ -83,7 +88,6 @@ var ViewModel = function() {
     };
 
     this.initializeMarkers = function() {
-
         //Adding one info window for the map. It will be reassigned to different markers upon map events
         self.infoWindow = new google.maps.InfoWindow({
             content: ""
@@ -205,6 +209,12 @@ var ViewModel = function() {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
                 contentGoogle = place;
                 self.findFoursquareData();
+            } else {
+                var errorMessage = '<div>Problem loading data...<br>' +
+                    'Error message: ' + status + '</div>';
+                console.log(status);
+                self.infoWindow.setContent(errorMessage);
+                self.infoWindow.open(self.map, self.currentMarker());
             }
         }
     };
@@ -226,7 +236,11 @@ var ViewModel = function() {
                 self.showInfoWindow();
             })
             .fail(function(reason) {
-                console.debug(reason);
+                var errorMessage = '<div>Problem loading data...<br>' +
+                    'Error message: ' + reason + '</div>';
+                console.log(reason);
+                self.infoWindow.setContent(errorMessage);
+                self.infoWindow.open(self.map, self.currentMarker());
             });
     };
 
@@ -256,7 +270,6 @@ var ViewModel = function() {
 
         for (venue in contentFoursquare) {
             var tmp = contentFoursquare[venue].venue;
-            console.log(tmp);
             localVenuesString += '<div><strong>' + tmp.name + '</strong> - ' + tmp.categories[0].name + '<br>' +
                 tmp.location.formattedAddress[0] + ' ' + tmp.location.formattedAddress[1] + '<br>';
 
@@ -266,7 +279,6 @@ var ViewModel = function() {
             if (typeof tmp.url !== 'undefined') {
                 localVenuesString += '<a href=' + tmp.url + '>' + tmp.url + '</a>';
             }
-
             localVenuesString += '</div><br>';
         }
 
