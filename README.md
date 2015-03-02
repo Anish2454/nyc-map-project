@@ -2,6 +2,8 @@
 
 This single-page application shows a list of all the public restrooms in NYC parks and their location on a Google Map. Users can filter by borough or search through the list. Clicking on a map marker reveals information about the restroom, as well as local venues and pictures of the area.
 
+Link to live page: [http://irealva.github.io/nyc-map-project/dist/](http://irealva.github.io/nyc-map-project/dist/)
+
 ####Part 1: Finding location data for public restrooms in New York (Not included in this repo)
 
 First, I found the relevant data on NYC parks and restrooms online and linked restroom locations to latitude and longitude coordinates.

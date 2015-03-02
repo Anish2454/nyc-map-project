@@ -15,14 +15,14 @@ gulp.task('js', function() {
           .pipe(gulp.dest('./dist/'));
 });
 
-// Concatenates and minifies CSS files, rewrites relative paths to Bootstrap fonts, copies Bootstrap fonts
+// Concatenates CSS files, rewrites relative paths to Bootstrap fonts, copies Bootstrap fonts
 gulp.task('css', function () {
     var bowerCss = gulp.src('src/bower_modules/components-bootstrap/css/bootstrap.min.css')
-            .pipe(replace(/url\((')?\.\.\/fonts\//g, 'url($1fonts/')),
-        appCss = gulp.src('src/css/*.css'),
-        combinedCss = es.concat(bowerCss, appCss).pipe(minifyCSS()).pipe(concat('css.css')),
+            .pipe(replace(/url\((')?\.\.\/fonts\//g, 'url($1fonts/')).pipe(minifyCSS({keepBreaks:true})),
+        appCss = gulp.src('src/css/*.css').pipe(minifyCSS({keepBreaks:true})),
+        combinedCss = es.concat(bowerCss, appCss).pipe(concat('css.css')),
         fontFiles = gulp.src('./src/bower_modules/components-bootstrap/fonts/*', { base: './src/bower_modules/components-bootstrap/' });
-    return es.concat(combinedCss, fontFiles)
+    return es.concat(combinedCss.pipe(minifyCSS()), fontFiles)
         .pipe(gulp.dest('./dist/'));
 });
 
