@@ -1,3 +1,12 @@
+/** 
+ * model.js
+ * Data representing restrooms in NYC parks
+ * Data sourced from the NYC.gov website
+ * @author Irene Alvarado
+ */
+
+/* ======= Model ======= */
+
 var filters = [ "All", "Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"] ;
 
 var restrooms = [
