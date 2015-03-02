@@ -14,31 +14,31 @@ https://data.cityofnewyork.us/Recreation/Directory-Of-Toilets-In-Public-Parks/hj
 ####Part 2: Building a map based on the data
 
 ######What you need:
+npm
 Bower
-
 Gulp
 
 
 ######To create the development version:
 
-1) First install packages to their newest versions according to bower.json
+1) Install the dependencies in the local node_modules folder, based on the package.json file
+
+`npm install`
+
+2) Install packages to their newest versions according to bower.json
 
 `bower update`
 
-2) Then use gulp to create the /dist folder
+3) Use gulp to create the /dist folder
 
 `gulp`
 
-3) Open /dist/index.html to see the map.
+4) Open /dist/index.html to see the map.
 
 ####References used
 
 Udacity website
-
 KnockoutJS documentation
-
 Foursquare API documentation
-
 Google Maps APi documentation
-
 Yeoman generator for KnockoutJS
