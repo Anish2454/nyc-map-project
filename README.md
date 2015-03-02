@@ -1,12 +1,12 @@
 ## Public Restrooms in NYC Parks Map Project
 
-This single-page application shows a list of all the public restrooms in NYC parks and their location on a Gooogle Map. Users can filter by borough or search through the list. Clicking on a map marker reveals information about the restroom, as well as local venues and pictures of the area.
+This single-page application shows a list of all the public restrooms in NYC parks and their location on a Google Map. Users can filter by borough or search through the list. Clicking on a map marker reveals information about the restroom, as well as local venues and pictures of the area.
 
 ####Part 1: Finding location data for public restrooms in New York (Not included in this repo)
 
-First, I performed some data wrangling to link information about public restrooms in NYC parks to latitude and longitude coordinates.
+First, linked information about public restrooms in NYC parks to latitude and longitude coordinates.
 
-1) I found a json of all the public toilets in the city by making an API request here: 
+1) I found a json of all the public restrooms in the city by making an API request here: 
 https://data.cityofnewyork.us/Recreation/Directory-Of-Toilets-In-Public-Parks/hjae-yuav
 
 2) Using the Google Geocoding API I matched the restroom location and borough to latitude and longitude coordinates, as well as place_id. In included this data in model.js.
@@ -15,7 +15,9 @@ https://data.cityofnewyork.us/Recreation/Directory-Of-Toilets-In-Public-Parks/hj
 
 ######What you need:
 Bower
+
 Gulp
+
 
 ######To create the development version:
 
@@ -32,6 +34,11 @@ Gulp
 ####References used
 
 Udacity website
-Knockout documentation
+
+KnockoutJS documentation
+
 Foursquare API documentation
+
 Google Maps APi documentation
+
+Yeoman generator for KnockoutJS
