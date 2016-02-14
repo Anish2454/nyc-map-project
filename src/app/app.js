@@ -9,7 +9,6 @@
 
 // Raw data is in model.js
 
-
 /**
  * Location object class
  * @param {array of locations} takes in an array of locations (currently the one in model.js)
