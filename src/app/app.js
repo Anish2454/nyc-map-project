@@ -360,6 +360,7 @@ var ViewModel = function() {
         contentString += localVenuesString;
 
         //3. Nearby photos from Google
+        /*
         if (typeof photos !== 'undefined') {
             contentString += '<h5>Nearby photos: </h5>';
             var imageString = '<div class="row text-center">';
@@ -373,6 +374,7 @@ var ViewModel = function() {
 
             contentString += imageString;
         }
+        */
 
         self.infoWindow.setContent(contentString);
         self.infoWindow.open(self.map, self.currentMarker());
