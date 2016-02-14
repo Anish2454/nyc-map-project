@@ -276,6 +276,7 @@ var ViewModel = function() {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
                 contentGoogle = place;
                 self.findFoursquareData();
+                
             } else { //In case of an error display a message inside the InfoWindow
                 var errorMessage = '<div>Problem loading data...<br>' +
                     'Error message: ' + status + '</div>';
@@ -294,8 +295,9 @@ var ViewModel = function() {
         var clientID = 'HYHN4QP4JTA3XGD32S21GJFCXSLHAGTCADUNJEQT4AGCI01N';
         var secret = 'G4M441LF3KLNRI0EXV5K42IC3I0NAH0VOJEBVN0BJNE0GXG5';
         var date = '20150226'; //Foursquare requires a date, essentially a version parameter 
-        var lat = self.currentMarker().position.k;
-        var lng = self.currentMarker().position.D;
+        //console.log(self.currentMarker().position.k) ;
+        var lat = self.currentMarker().position.lat();
+        var lng = self.currentMarker().position.lng();
 
         $.ajax({
                 url: 'https://api.foursquare.com/v2/venues/explore?client_id=' + clientID + '&client_secret=' +
@@ -309,7 +311,6 @@ var ViewModel = function() {
             .fail(function(reason) { //When the Deferred object is rejected
                 var errorMessage = '<div>Problem loading data...<br>' +
                     'Error message: ' + reason + '</div>';
-                console.log(reason);
                 self.infoWindow.setContent(errorMessage);
                 self.infoWindow.open(self.map, self.currentMarker());
             });
